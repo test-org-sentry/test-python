@@ -26,7 +26,7 @@ def init_sentry():
         # Environment
         environment=Config.DEBUG and "development" or "production",
         # Release tracking
-        release="test-python@1.0.0",
+        release="test-org-sentry/test-python@1.0.0",
         # Disable local variables to avoid serialization issues
         include_local_variables=False,
         # Custom tags
