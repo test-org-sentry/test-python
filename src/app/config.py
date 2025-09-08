@@ -10,7 +10,7 @@ class Config:
     """Base configuration class."""
     
     # Sentry Configuration
-    SENTRY_DSN = os.environ['SENTRY_DSN']
+    SENTRY_DSN = os.environ.get('SENTRY_DSN')
     
     # Flask Configuration
     SECRET_KEY = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-production')

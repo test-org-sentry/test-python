@@ -15,6 +15,15 @@ from .external_apis import call_external_api, process_payment
 from .utils import validate_email, calculate_discount, process_file
 from .background_tasks import send_email_async, cleanup_old_data
 
+def get_sentry_status():
+    """Get Sentry configuration status information."""
+    return {
+        'sentry_dsn_present': bool(Config.SENTRY_DSN),
+        'sentry_dsn': Config.SENTRY_DSN,
+        'debug_mode': Config.DEBUG,
+        'environment': Config.DEBUG and "development" or "production"
+    }
+
 # Initialize Sentry
 init_sentry()
 
@@ -37,11 +46,50 @@ HTML_TEMPLATE = """
         .error { color: red; }
         .success { color: green; }
         .section { margin: 20px 0; padding: 20px; border: 1px solid #ddd; }
+        .status-section { margin: 20px 0; padding: 20px; border: 2px solid #007cba; background: #f8f9fa; }
+        .status-item { margin: 5px 0; }
+        .status-label { font-weight: bold; }
+        .status-value { margin-left: 10px; }
+        .status-ok { color: #28a745; }
+        .status-warning { color: #ffc107; }
+        .status-error { color: #dc3545; }
     </style>
 </head>
 <body>
     <h1>Sentry Test Application</h1>
     <p>This application is designed to generate various types of errors for Sentry testing.</p>
+    
+    <div class="status-section">
+        <h2>🔧 Sentry Configuration Status</h2>
+        <div class="status-item">
+            <span class="status-label">DSN Present:</span>
+            <span class="status-value {{ 'status-ok' if sentry_status.sentry_dsn_present else 'status-error' }}">
+                {{ '✅ Yes' if sentry_status.sentry_dsn_present else '❌ No' }}
+            </span>
+        </div>
+        <div class="status-item">
+            <span class="status-label">Environment:</span>
+            <span class="status-value status-ok">{{ sentry_status.environment.title() }}</span>
+        </div>
+        <div class="status-item">
+            <span class="status-label">Debug Mode:</span>
+            <span class="status-value {{ 'status-warning' if sentry_status.debug_mode else 'status-ok' }}">
+                {{ '⚠️ Enabled' if sentry_status.debug_mode else '✅ Disabled' }}
+            </span>
+        </div>
+        {% if sentry_status.sentry_dsn %}
+        <div class="status-item">
+            <span class="status-label">DSN:</span>
+            <span class="status-value" style="font-family: monospace; font-size: 0.9em;">{{ sentry_status.sentry_dsn }}</span>
+        </div>
+        {% endif %}
+        {% if not sentry_status.sentry_dsn_present %}
+        <div class="status-item" style="margin-top: 15px; padding: 10px; background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 4px;">
+            <strong>⚠️ Warning:</strong> Sentry is not configured. Errors will not be sent to Sentry. 
+            Please set the SENTRY_DSN environment variable or add it to your .env file.
+        </div>
+        {% endif %}
+    </div>
     
     <div class="section">
         <h2>Basic Error Tests</h2>
@@ -129,7 +177,8 @@ HTML_TEMPLATE = """
 @app.route('/')
 def index():
     """Main page with test interface."""
-    return render_template_string(HTML_TEMPLATE)
+    sentry_status = get_sentry_status()
+    return render_template_string(HTML_TEMPLATE, sentry_status=sentry_status)
 
 @app.route('/health')
 def health():

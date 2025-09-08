@@ -7,6 +7,14 @@ from .config import Config
 
 def init_sentry():
     """Initialize Sentry SDK with appropriate integrations."""
+    # Check if Sentry DSN is configured
+    if not Config.SENTRY_DSN:
+        print("WARNING: SENTRY_DSN not configured. Sentry will not capture errors.")
+        print("Please set SENTRY_DSN environment variable or add it to .env file")
+        return
+    
+    print(f"Initializing Sentry with DSN: {Config.SENTRY_DSN}")
+    
     # Use only Flask integration for now to avoid dependency issues
     integrations = []
     
