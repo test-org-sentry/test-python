@@ -6,7 +6,7 @@
     "exception": {
       "values": [
         {
-          "type": "EnvironmentBugTestError4",
+          "type": "EnvironmentBugTestError5",
           "value": "Test error for environment staging with release backend@1.1.0",
           "module": "test_module",
           "stacktrace": {
@@ -16,7 +16,7 @@
                 "function": "test_function",
                 "lineno": 42,
                 "abs_path": "/path/to/test_file.py",
-                "context_line": "raise EnvironmentBugTestError4('Test error')",
+                "context_line": "raise EnvironmentBugTestError5('Test error')",
                 "pre_context": [
                   "def test_function():",
                   "    # This is a test function"
